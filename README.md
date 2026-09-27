@@ -106,23 +106,6 @@ python yunyundong_full.py
 
 ---
 
-## API 一览
-
-```
-POST /m-api/login/appLogin              登录
-POST /m-api/login/getStudentInfo        学籍
-POST /m-api/run/getHomeRunInfo          任务卡
-POST /m-api/run/start                   开始
-POST /m-api/run/splitPointCheating      轨迹分段 (gzip)
-POST /m-api/run/finish                  结束
-POST /m-api/run/crsReocordInfoList      历史
-POST /m-api/run/crsReocordInfo          历史详情 (pointsList)
-POST /m-api/run/addRecordAppeal         申诉
-+ 课程/场馆/社团/考试/公告/问卷/AI 体测/人脸 ...
-```
-
----
-
 ## 合格配方
 
 - 里程 2.6–10 km（默认 3.0）
