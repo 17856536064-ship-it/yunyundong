@@ -1,12 +1,50 @@
 # 云运动 · yunyundong
 
-云运动 / LePao **3.6.6** 协议完整复现 + 自动跑步客户端。
+> **云运动 / LePao 3.6.6 协议完整复现 + 自动跑步客户端**
 
-> 仅供学习交流。使用者自负一切责任。
+一次性搞懂云运动加解密、登录、跑步全流程，并直接能跑。
 
-## 功能
+---
 
-- **协议完整复现**：SM4-ECB + SM2 包 SM4（cipherKey）+ MD5 sign
+## 核心功能
+
+### 1. 一键跑步 · 真实 GPS 轨迹
+
+![一键跑步](docs/feat-run.png)
+
+> 红字说明：真实 GPS 轨迹生成 · 打卡点自动踩点 · SM4 加密上传 · 一键合格跑
+
+### 2. 历史真实轨迹复现
+
+![历史轨迹复现](docs/feat-replay.png)
+
+> 红字说明：选一次历史跑步 · 真实 GPS 轨迹 50 点 · 按原轨迹完整重放 · 坐标/时间完全还原
+
+### 3. 多账户批量 · 学校切换
+
+![多账户](docs/feat-accounts.png)
+
+> 红字说明：批量账号管理 · 一键批量跑步 · 随机设备指纹 · 切换 90+ 学校
+
+### 4. SM4 国密加解密
+
+![加解密](docs/feat-crypto.png)
+
+> 红字说明：SM4-ECB 国密加密 · SM2 包 SM4 密钥 · 自动签名 MD5 · 响应自动解密
+
+---
+
+## 界面预览
+
+| 任务卡 | 跑步 | 历史复现 | 多账户 |
+|--------|------|----------|--------|
+| ![首页](docs/screenshot-home.png) | ![跑步](docs/screenshot-run.png) | ![复现](docs/screenshot-replay.png) | ![多账户](docs/screenshot-accounts.png) |
+
+---
+
+## 功能清单
+
+- **协议完整复现**：SM4-ECB + SM2 包 SM4（cipherKey / content / sign）
 - **一键跑步**：打表 / 快速 / 真实 GPS 轨迹 + 漂移
 - **历史轨迹复现**：选一次历史跑步，按原轨迹点完整重放
 - **多账户批量**：批量账号管理，一键批量跑
@@ -14,28 +52,24 @@
 - **学校切换**：90+ 学校列表 / 随机切校
 - **设备指纹**：12 种机型随机
 - **定时挂机**：每日定时 / 批量 config
+- **动态地图**：中心自动取打卡点包围盒，换校自动跳转
 - **GUI + CLI**：桌面工作台（内置 Web DEV CONSOLE）+ 命令行
+
+---
 
 ## 快速开始
 
 ```bash
-pip install -r requirements.txt   # 仅 gmssl 可选，纯 stdlib 也能跑
-python yunyundong_full.py          # 启动 Web 工作台
+cp yunyundong_config.example.json yunyundong_config.json
+# 填 username / password / school_id
+python yunyundong_full.py
 ```
 
 或直接用 `云运动全功能.exe`（独立运行，无需 Python）。
 
-填账号：
-
-```bash
-cp yunyundong_config.example.json yunyundong_config.json
-# 编辑 username / password / school_id
-python yunyundong_full.py login --user 学号 --pass 密码
-```
+---
 
 ## 配置
-
-`yunyundong_config.json`：
 
 ```json
 {
@@ -55,6 +89,8 @@ python yunyundong_full.py login --user 学号 --pass 密码
 
 **注意**：`yunyundong_config.json` 含账号密码，**不要提交到 git**（已在 `.gitignore`）。
 
+---
+
 ## 协议要点
 
 | 项 | 值 |
@@ -68,6 +104,8 @@ python yunyundong_full.py login --user 学号 --pass 密码
 | version | `3.6.6`（3.5.10 会被拒） |
 | 登录 | `{"userName","password","schoolId","type":"1"}` |
 
+---
+
 ## API 一览
 
 ```
@@ -80,11 +118,10 @@ POST /m-api/run/finish                  结束
 POST /m-api/run/crsReocordInfoList      历史
 POST /m-api/run/crsReocordInfo          历史详情 (pointsList)
 POST /m-api/run/addRecordAppeal         申诉
-POST /m-api/runAvoid/crsRunAvoidSave    免跑
-+ 课程/场馆/社团/考试/公告/问卷/AI 体测/成绩 ...
++ 课程/场馆/社团/考试/公告/问卷/AI 体测/人脸 ...
 ```
 
-完整列表见 `云运动协议分析.md`。
+---
 
 ## 合格配方
 
@@ -96,6 +133,8 @@ POST /m-api/runAvoid/crsRunAvoidSave    免跑
 
 实测：3.0km / 840s / 50 点 / 踩 5 点 →「恭喜你当前跑步成绩合格」
 
+---
+
 ## 文件说明
 
 | 文件 | 用途 |
@@ -105,17 +144,10 @@ POST /m-api/runAvoid/crsRunAvoidSave    免跑
 | `sm4_std.py` | 标准 SM4（过国标测试向量） |
 | `run_qualified.py` | 合格跑步脚本 |
 | `云运动工作站.html` | 网页版工作台 |
-| `云运动协议分析.md` | 协议细节 |
-| `使用教程.md` | 图文教程 |
+| `docs/` | 功能截图（含红字标注） |
 | `本地代理.py` | 网页版跨域代理 |
 
-## 技术栈
-
-- 纯 Python stdlib（tkinter / http.server / hashlib）
-- SM4-ECB-PKCS7（GB/T 32907）
-- SM2 包 SM4（gmssl 可选）
-- 本地 Web 工作台（127.0.0.1:17653-17669）
-- 高德瓦片离线地图
+---
 
 ## 免责声明
 
