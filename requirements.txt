@@ -1,0 +1,4 @@
+# 纯 stdlib 即可运行
+# 可选：
+# gmssl>=2.2.1   # SM2 加密（仅在需要自生成 cipherKey 时）
+# requests>=2.28 # 可选 HTTP 客户端

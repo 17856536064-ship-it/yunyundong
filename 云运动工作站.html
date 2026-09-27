@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>云运动 · 工作台</title>
+<style>
+:root{
+  --bg:#F2F3F5; --card:#FFFFFF; --border:#E5E6EB; --border-strong:#C9CDD4;
+  --t1:#1D2129; --t2:#4E5969; --t3:#86909C; --t4:#C9CDD4;
+  --blue:#165DFF; --blue-hover:#0E42D2; --blue-bg:#E8F3FF;
+  --green:#00B42A; --green-bg:#E8FFEA;
+  --red:#F53F3F; --red-bg:#FFECE8;
+  --orange:#FF7D00; --orange-bg:#FFF7E8;
+  --purple:#722ED1;
+  --mono:"JetBrains Mono","SF Mono",Consolas,"Cascadia Code",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Segoe UI",sans-serif;
+  --shadow:0 1px 2px rgba(0,0,0,.03),0 4px 16px rgba(0,0,0,.04);
+  --shadow-hover:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:14px}
+::selection{background:var(--blue);color:#fff}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#E5E6EB;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#C9CDD4}
+button{font-family:var(--sans)}
+
+/* ── 顶栏 ── */
+#top{
+  height:56px;background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;padding:0 24px;
+  position:sticky;top:0;z-index:100;
+}
+.logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#165DFF,#4080FF);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px}
+.brand h1{font-size:16px;font-weight:600;color:var(--t1);letter-spacing:.2px}
+.brand p{font-size:12px;color:var(--t3);margin-top:1px}
+#top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;
+  background:var(--bg);color:var(--t2);font-size:12px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.dot.warn{background:var(--orange)} .dot.err{background:var(--red)}
+#clock{font-variant-numeric:tabular-nums;color:var(--t2);font-size:13px}
+
+/* ── 布局 ── */
+#shell{display:grid;grid-template-columns:200px 1fr;height:calc(100vh - 56px - 172px)}
+#nav{background:#fff;border-right:1px solid var(--border);padding:16px 12px;overflow:auto}
+.nav-h{font-size:11px;color:var(--t3);letter-spacing:.5px;padding:8px 12px 6px;font-weight:500}
+.nav-i{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--t2);
+  transition:all .15s ease;margin-bottom:2px;
+}
+.nav-i:hover{background:var(--bg);color:var(--t1)}
+.nav-i.on{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.nav-i .tag{font-size:11px;color:var(--t3)}
+.nav-i.on .tag{color:var(--blue)}
+
+#main{overflow:auto;padding:20px 24px}
+
+/* ── 卡片 ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px 22px;margin-bottom:16px;transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card-t{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.card-d{font-size:12px;color:var(--t3);margin-bottom:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+
+/* ── 表单 ── */
+label{display:block;font-size:12px;color:var(--t2);margin:14px 0 6px;font-weight:500}
+input,select,textarea{
+  width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;
+  color:var(--t1);font-family:var(--sans);font-size:13px;padding:8px 12px;outline:none;
+  transition:all .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(22,93,255,.12)}
+input::placeholder,textarea::placeholder{color:var(--t4)}
+textarea{min-height:88px;resize:vertical;font-family:var(--mono);font-size:12px;line-height:1.6}
+.row{display:flex;gap:12px} .row>*{flex:1}
+.row-tight{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;border:1px solid transparent;
+  transition:all .15s;font-weight:500;user-select:none;
+}
+.btn-pri{background:var(--blue);color:#fff}
+.btn-pri:hover{background:var(--blue-hover)}
+.btn-def{background:#fff;color:var(--t1);border-color:var(--border-strong)}
+.btn-def:hover{border-color:var(--blue);color:var(--blue)}
+.btn-suc{background:var(--green);color:#fff}
+.btn-suc:hover{filter:brightness(.95)}
+.btn-dan{background:var(--red);color:#fff}
+.btn-dan:hover{filter:brightness(.95)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── 信息行 ── */
+.kv{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid #F2F3F5;font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--t3)}
+.kv span:last-child{color:var(--t1);font-variant-numeric:tabular-nums;max-width:60%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;
+  font-size:12px;background:var(--bg);color:var(--t2);margin-right:6px}
+.pill.g{background:var(--green-bg);color:var(--green)}
+.pill.b{background:var(--blue-bg);color:var(--blue)}
+.pill.o{background:var(--orange-bg);color:var(--orange)}
+.pill.r{background:var(--red-bg);color:var(--red)}
+
+/* ── 表格 ── */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--t3);font-weight:500;font-size:12px;
+  padding:10px 12px;border-bottom:1px solid var(--border);background:#FAFBFC}
+td{padding:12px;border-bottom:1px solid #F2F3F5;color:var(--t1)}
+tr:hover td{background:#FAFBFC}
+td.m{font-family:var(--mono);font-size:12px;color:var(--t2)}
+td.ok{color:var(--green)} td.er{color:var(--red)}
+
+/* ── 代码/日志 ── */
+.code{
+  background:#1D2129;border-radius:8px;padding:14px 16px;color:#E5E6EB;
+  font-family:var(--mono);font-size:12px;line-height:1.7;
+  overflow:auto;max-height:220px;white-space:pre-wrap;word-break:break-all;
+}
+#log{
+  height:172px;background:#fff;border-top:1px solid var(--border);
+  display:flex;flex-direction:column;
+}
+#log-bar{display:flex;align-items:center;gap:10px;padding:8px 20px;border-bottom:1px solid var(--border)}
+#log-bar .t{font-size:13px;font-weight:600;color:var(--t1)}
+#log-bar .sub{font-size:12px;color:var(--t3)}
+#logbox{flex:1;overflow:auto;padding:10px 20px;font-family:var(--mono);font-size:12px;
+  line-height:1.7;background:#FAFBFC}
+#logbox div{white-space:pre-wrap;word-break:break-all}
+.ts{color:var(--t4);margin-right:6px}
+.ok{color:var(--green)} .err{color:var(--red)} .warn{color:var(--orange)}
+.in{color:var(--blue)} .out{color:var(--purple)} .sys{color:var(--t3)}
+
+/* ── 滑杆 ── */
+.slider-row{display:flex;align-items:center;gap:12px;margin:6px 0}
+.slider-row label{margin:0;min-width:64px;font-size:12px;color:var(--t2)}
+input[type=range]{flex:1;accent-color:var(--blue);height:4px;padding:0;border:0;background:var(--border)}
+.slider-val{min-width:52px;text-align:right;color:var(--t1);font-variant-numeric:tabular-nums;font-size:13px}
+
+/* ── 进度条 ── */
+.bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#165DFF,#4080FF);width:0%;
+  border-radius:3px;transition:width .4s ease}
+
+/* ── 步骤 ── */
+.seq{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.st{padding:6px 12px;border-radius:6px;background:var(--bg);color:var(--t3);font-size:12px}
+.st.act{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.st.done{background:var(--green-bg);color:var(--green)}
+
+.msg{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.msg.show{display:block}
+.msg.ok{background:var(--green-bg);color:var(--green)}
+.msg.err{background:var(--red-bg);color:var(--red)}
+
+.mono-sm{font-family:var(--mono);font-size:12px;color:var(--t2);word-break:break-all;line-height:1.6}
+.hint{font-size:12px;color:var(--t3);line-height:1.6;margin-top:8px}
+.dark-label{font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.3px}
+
+/* ── 真实地图 ── */
+.realmap{position:relative;width:100%;height:320px;background:#E8EBEE;border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
+.realmap:active{cursor:grabbing}
+.rm-canvas{position:absolute;inset:0;overflow:hidden}
+.rm-t{position:absolute;width:256px;height:256px;pointer-events:none}
+.rm-svg{position:absolute;left:0;top:0;pointer-events:none}
+.rm-mk{position:absolute;width:22px;height:22px;border-radius:50%;background:#C9CDD4;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);border:2px solid #fff;pointer-events:none;z-index:2}
+.rm-mk.on{background:var(--blue)}
+.rm-zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px;z-index:3}
+.rm-zoom button{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:6px;
+  color:var(--t1);font-size:16px;cursor:pointer;line-height:1;box-shadow:var(--shadow)}
+.rm-zoom button:hover{color:var(--blue);border-color:var(--blue)}
+.rm-attr{position:absolute;left:8px;bottom:4px;font-size:10px;color:var(--t3);background:rgba(255,255,255,.75);
+  padding:2px 6px;border-radius:4px;z-index:3}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--t3)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--card);padding:4px;
+  border-radius:10px;border:1px solid var(--border);width:fit-content}
+.tab{padding:7px 16px;border-radius:7px;cursor:pointer;color:var(--t2);font-size:13px;transition:all .15s}
+.tab:hover{color:var(--t1)}
+.tab.on{background:var(--blue);color:#fff;font-weight:500}
+</style>
+</head>
+<body>
+
+<div id="top">
+  <div class="logo">Y</div>
+  <div class="brand">
+    <h1>云运动 · 工作台</h1>
+    <p>LePao 3.6.6 · 协议客户端 · rev.2026.09</p>
+  </div>
+  <div class="right">
+    <div class="chip"><i class="dot" id="led-net"></i>已连接</div>
+    <div class="chip"><i class="dot" id="led-cry"></i>SM4 就绪</div>
+    <div class="chip"><i class="dot warn" id="led-auth"></i>token</div>
+    <div class="chip"><select id="base-sw" onchange="switchBase(this.value)" style="background:transparent;border:0;color:var(--t2);font-size:12px;outline:none">
+      <option value="proxy">本地代理 :8787</option>
+      <option value="direct">直连网关</option>
+    </select></div>
+    <div id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div id="shell">
+  <div id="nav">
+    <div class="nav-h">核心</div>
+    <div class="nav-i on" data-tab="run">跑步控制<span class="tag">RUN</span></div>
+    <div class="nav-i" data-tab="auth">账号登录<span class="tag">AUTH</span></div>
+    <div class="nav-i" data-tab="timer">定时挂机<span class="tag">TIMER</span></div>
+    <div class="nav-h">工具</div>
+    <div class="nav-i" data-tab="api">接口调试<span class="tag">API</span></div>
+    <div class="nav-i" data-tab="crypto">加解密<span class="tag">SM4</span></div>
+    <div class="nav-i" data-tab="track">轨迹编辑<span class="tag">GPS</span></div>
+    <div class="nav-i" data-tab="hist">历史成绩<span class="tag">DATA</span></div>
+    <div class="nav-h">预设</div>
+    <div class="nav-i" data-preset="qualified">合格 3.0km</div>
+    <div class="nav-i" data-preset="quick">快速模式</div>
+    <div class="nav-i" data-preset="morning">晨跑 2.6km</div>
+    <div class="nav-i" data-preset="copycfg">导出配置</div>
+  </div>
+  <div id="main"></div>
+</div>
+
+<div id="log">
+  <div id="log-bar">
+    <span class="t">运行日志</span>
+    <span class="sub" id="log-count">0 条</span>
+    <div style="margin-left:auto"></div>
+    <button class="btn btn-def btn-sm" onclick="clearLog()">清空</button>
+    <button class="btn btn-def btn-sm" onclick="exportLog()">导出</button>
+  </div>
+  <div id="logbox"></div>
+</div>
+
+<script>
+/* ═══ SM4 (GB/T 32907) ═══ */
+const SBOX=[0xD6,0x90,0xE9,0xFE,0xCC,0xE1,0x3D,0xB7,0x16,0xB6,0x14,0xC2,0x28,0xFB,0x2C,0x05,
+0x2B,0x67,0x9A,0x76,0x2A,0xBE,0x04,0xC3,0xAA,0x44,0x13,0x26,0x49,0x86,0x06,0x99,
+0x9C,0x42,0x50,0xF4,0x91,0xEF,0x98,0x7A,0x33,0x54,0x0B,0x43,0xED,0xCF,0xAC,0x62,
+0xE4,0xB3,0x1C,0xA9,0xC9,0x08,0xE8,0x95,0x80,0xDF,0x94,0xFA,0x75,0x8F,0x3F,0xA6,
+0x47,0x07,0xA7,0xFC,0xF3,0x73,0x17,0xBA,0x83,0x59,0x3C,0x19,0xE6,0x85,0x4F,0xA8,
+0x68,0x6B,0x81,0xB2,0x71,0x64,0xDA,0x8B,0xF8,0xEB,0x0F,0x4B,0x70,0x56,0x9D,0x35,
+0x1E,0x24,0x0E,0x5E,0x63,0x58,0xD1,0xA2,0x25,0x22,0x7C,0x3B,0x01,0x21,0x78,0x87,
+0xD4,0x00,0x46,0x57,0x9F,0xD3,0x27,0x52,0x4C,0x36,0x02,0xE7,0xA0,0xC4,0xC8,0x9E,
+0xEA,0xBF,0x8A,0xD2,0x40,0xC7,0x38,0xB5,0xA3,0xF7,0xF2,0xCE,0xF9,0x61,0x15,0xA1,
+0xE0,0xAE,0x5D,0xA4,0x9B,0x34,0x1A,0x55,0xAD,0x93,0x32,0x30,0xF5,0x8C,0xB1,0xE3,
+0x1D,0xF6,0xE2,0x2E,0x82,0x66,0xCA,0x60,0xC0,0x29,0x23,0xAB,0x0D,0x53,0x4E,0x6F,
+0xD5,0xDB,0x37,0x45,0xDE,0xFD,0x8E,0x2F,0x03,0xFF,0x6A,0x72,0x6D,0x6C,0x5B,0x51,
+0x8D,0x1B,0xAF,0x92,0xBB,0xDD,0xBC,0x7F,0x11,0xD9,0x5C,0x41,0x1F,0x10,0x5A,0xD8,
+0x0A,0xC1,0x31,0x88,0xA5,0xCD,0x7B,0xBD,0x2D,0x74,0xD0,0x12,0xB8,0xE5,0xB4,0xB0,
+0x89,0x69,0x97,0x4A,0x0C,0x96,0x77,0x7E,0x65,0xB9,0xF1,0x09,0xC5,0x6E,0xC6,0x84,
+0x18,0xF0,0x7D,0xEC,0x3A,0xDC,0x4D,0x20,0x79,0xEE,0x5F,0x3E,0xD7,0xCB,0x39,0x48];
+const FK=[0xA3B1BAC6,0x56AA3350,0x677D9197,0xB27022DC];
+const CK=[0x00070e15,0x1c232a31,0x383f464d,0x545b6269,0x70777e85,0x8c939aa1,0xa8afb6bd,0xc4cbd2d9,
+0xe0e7eef5,0xfc030a11,0x181f262d,0x343b4249,0x50575e65,0x6c737a81,0x888f969d,0xa4abb2b9,
+0xc0c7ced5,0xdce3eaf1,0xf8ff060d,0x141b2229,0x30373e45,0x4c535a61,0x686f767d,0x848b9299,
+0xa0a7aeb5,0xbcc3cad1,0xd8dfe6ed,0xf4fb0209,0x10171e25,0x2c333a41,0x484f565d,0x646b7279];
+const rotl=(x,n)=>((x<<n)|(x>>>(32-n)))>>>0;
+const tau=a=>(SBOX[(a>>>24)&255]<<24)|(SBOX[(a>>>16)&255]<<16)|(SBOX[(a>>>8)&255]<<8)|SBOX[a&255];
+const Lenc=b=>(b^rotl(b,2)^rotl(b,10)^rotl(b,18)^rotl(b,24))>>>0;
+const Lkey=b=>(b^rotl(b,13)^rotl(b,23))>>>0;
+const Tenc=x=>Lenc(tau(x));
+const Tkey=x=>Lkey(tau(x));
+function sm4ks(key){
+  const mk=[0,1,2,3].map(i=>((key[i*4]<<24)|(key[i*4+1]<<16)|(key[i*4+2]<<8)|key[i*4+3])>>>0);
+  const k=[mk[0]^FK[0],mk[1]^FK[1],mk[2]^FK[2],mk[3]^FK[3]];
+  const rk=[];
+  for(let i=0;i<32;i++){
+    const t=(k[i]^Tkey((k[i+1]^k[i+2]^k[i+3]^CK[i])>>>0))>>>0;
+    k.push(t);rk.push(t);
+  }
+  return rk;
+}
+function sm4blk(rk,b,dec){
+  let x=[0,1,2,3].map(i=>((b[i*4]<<24)|(b[i*4+1]<<16)|(b[i*4+2]<<8)|b[i*4+3])>>>0);
+  const o2=dec?rk.slice().reverse():rk;
+  for(let i=0;i<32;i++) x.push((x[i]^Tenc((x[i+1]^x[i+2]^x[i+3]^o2[i])>>>0))>>>0);
+  const o=new Uint8Array(16);
+  for(let j=0;j<4;j++){
+    const v=x[35-j];
+    o[j*4]=(v>>>24)&255;o[j*4+1]=(v>>>16)&255;o[j*4+2]=(v>>>8)&255;o[j*4+3]=v&255;
+  }
+  return o;
+}
+function sm4ecbEnc(key,data){const rk=sm4ks(key);const n=16-data.length%16;
+  const p=new Uint8Array(data.length+n);p.set(data);p.fill(n,data.length);
+  const o=new Uint8Array(p.length);for(let i=0;i<p.length;i+=16)o.set(sm4blk(rk,p.slice(i,i+16)),i);return o;}
+function sm4ecbDec(key,data){const rk=sm4ks(key);const o=new Uint8Array(data.length);
+  for(let i=0;i<data.length;i+=16)o.set(sm4blk(rk,data.slice(i,i+16),true),i);
+  const n=o[o.length-1];return n>=1&&n<=16?o.slice(0,o.length-n):o;}
+
+const b64e=u=>btoa(String.fromCharCode(...u));
+const b64d=s=>{const b=atob(s);return Uint8Array.from(b,c=>c.charCodeAt(0));};
+const u8=s=>new TextEncoder().encode(s);
+const u8d=u=>new TextDecoder().decode(u);
+function md5(s){function rl(x,n){return(x<<n)|(x>>>(32-n));}
+function cm(q,a,b,x,s,t){return rl(a+q+x+t|0,s)+b|0;}
+function ff(a,b,c,d,x,s,t){return cm((b&c)|(~b&d),a,b,x,s,t);}
+function gg(a,b,c,d,x,s,t){return cm((b&d)|(c&~d),a,b,x,s,t);}
+function hh(a,b,c,d,x,s,t){return cm(b^c^d,a,b,x,s,t);}
+function ii(a,b,c,d,x,s,t){return cm(c^(b|~d),a,b,x,s,t);}
+const msg=u8(s),n=msg.length,blk=Math.floor((n+8)/64)+1,buf=new Uint8Array(blk*64);
+buf.set(msg);buf[n]=0x80;const bit=n*8;
+buf[blk*64-8]=bit&255;buf[blk*64-7]=(bit>>>8)&255;buf[blk*64-6]=(bit>>>16)&255;buf[blk*64-5]=(bit>>>24)&255;
+let a=0x67452301,b=0xefcdab89,c=0x98badcfe,d=0x10325476;
+for(let i=0;i<blk;i++){const o=i*64,x=[];
+for(let j=0;j<16;j++)x[j]=(buf[o+j*4]|buf[o+j*4+1]<<8|buf[o+j*4+2]<<16|buf[o+j*4+3]<<24);
+let A=a,B=b,C=c,D=d;
+a=ff(a,b,c,d,x[0],7,0xd76aa478);d=ff(d,a,b,c,x[1],12,0xe8c7b756);c=ff(c,d,a,b,x[2],17,0x242070db);b=ff(b,c,d,a,x[3],22,0xc1bdceee);
+a=ff(a,b,c,d,x[4],7,0xf57c0faf);d=ff(d,a,b,c,x[5],12,0x4787c62a);c=ff(c,d,a,b,x[6],17,0xa8304613);b=ff(b,c,d,a,x[7],22,0xfd469501);
+a=ff(a,b,c,d,x[8],7,0x698098d8);d=ff(d,a,b,c,x[9],12,0x8b44f7af);c=ff(c,d,a,b,x[10],17,0xffff5bb1);b=ff(b,c,d,a,x[11],22,0x895cd7be);
+a=ff(a,b,c,d,x[12],7,0x6b901122);d=ff(d,a,b,c,x[13],12,0xfd987193);c=ff(c,d,a,b,x[14],17,0xa679438e);b=ff(b,c,d,a,x[15],22,0x49b40821);
+a=gg(a,b,c,d,x[1],5,0xf61e2562);d=gg(d,a,b,c,x[6],9,0xc040b340);c=gg(c,d,a,b,x[11],14,0x265e5a51);b=gg(b,c,d,a,x[0],20,0xe9b6c7aa);
+a=gg(a,b,c,d,x[5],5,0xd62f105d);d=gg(d,a,b,c,x[10],9,0x02441453);c=gg(c,d,a,b,x[15],14,0xd8a1e681);b=gg(b,c,d,a,x[4],20,0xe7d3fbc8);
+a=gg(a,b,c,d,x[9],5,0x21e1cde6);d=gg(d,a,b,c,x[14],9,0xc33707d6);c=gg(c,d,a,b,x[3],14,0xf4d50d87);b=gg(b,c,d,a,x[8],20,0x455a14ed);
+a=gg(a,b,c,d,x[13],5,0xa9e3e905);d=gg(d,a,b,c,x[2],9,0xfcefa3f8);c=gg(c,d,a,b,x[7],14,0x676f02d9);b=gg(b,c,d,a,x[12],20,0x8d2a4c8a);
+a=hh(a,b,c,d,x[5],4,0xfffa3942);d=hh(d,a,b,c,x[8],11,0x8771f681);c=hh(c,d,a,b,x[11],16,0x6d9d6122);b=hh(b,c,d,a,x[14],23,0xfde5380c);
+a=hh(a,b,c,d,x[1],4,0xa4beea44);d=hh(d,a,b,c,x[4],11,0x4bdecfa9);c=hh(c,d,a,b,x[7],16,0xf6bb4b60);b=hh(b,c,d,a,x[10],23,0xbebfbc70);
+a=hh(a,b,c,d,x[13],4,0x289b7ec6);d=hh(d,a,b,c,x[0],11,0xeaa127fa);c=hh(c,d,a,b,x[3],16,0xd4ef3085);b=hh(b,c,d,a,x[6],23,0x04881d05);
+a=hh(a,b,c,d,x[9],4,0xd9d4d039);d=hh(d,a,b,c,x[12],11,0xe6db99e5);c=hh(c,d,a,b,x[15],16,0x1fa27cf8);b=hh(b,c,d,a,x[2],23,0xc4ac5665);
+a=ii(a,b,c,d,x[0],6,0xf4292244);d=ii(d,a,b,c,x[7],10,0x432aff97);c=ii(c,d,a,b,x[14],15,0xab9423a7);b=ii(b,c,d,a,x[5],21,0xfc93a039);
+a=ii(a,b,c,d,x[12],6,0x655b59c3);d=ii(d,a,b,c,x[3],10,0x8f0ccc92);c=ii(c,d,a,b,x[10],15,0xffeff47d);b=ii(b,c,d,a,x[1],21,0x85845dd1);
+a=ii(a,b,c,d,x[8],6,0x6fa87e4f);d=ii(d,a,b,c,x[15],10,0xfe2ce6e0);c=ii(c,d,a,b,x[6],15,0xa3014314);b=ii(b,c,d,a,x[13],21,0x4e0811a1);
+a=ii(a,b,c,d,x[4],6,0xf7537e82);d=ii(d,a,b,c,x[11],10,0xbd3af235);c=ii(c,d,a,b,x[2],15,0x2ad7d2bb);b=ii(b,c,d,a,x[9],21,0xeb86d391);
+a=a+A|0;b=b+B|0;c=c+C|0;d=d+D|0;}
+const fin=x=>[x&255,(x>>>8)&255,(x>>>16)&255,(x>>>24)&255];
+return [...fin(a),...fin(b),...fin(c),...fin(d)].map(v=>v.toString(16).padStart(2,'0')).join('');}
+
+/* ═══ 真实地图（高德瓦片）═══ */
+function lon2tile(lon,z){return (lon+180)/360*Math.pow(2,z)*256;}
+function lat2tile(lat,z){
+  const s=Math.sin(lat*Math.PI/180);
+  return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*Math.pow(2,z)*256;
+}
+function tile2lon(x,z){return x/(Math.pow(2,z)*256)*360-180;}
+function tile2lat(y,z){
+  const n=Math.PI-2*Math.PI*y/(Math.pow(2,z)*256);
+  return 180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n)));
+}
+
+class RealMap{
+  constructor(el, opt={}){
+    this.el=el;
+    this.z=opt.z||17;
+    this.cx=lon2tile(opt.lon||117.5966, this.z);
+    this.cy=lat2tile(opt.lat||31.6083, this.z);
+    this.markers=[];
+    this.path=[];
+    el.classList.add("realmap");
+    el.innerHTML=`<div class="rm-canvas"></div><div class="rm-zoom"><button data-d="1">+</button><button data-d="-1">−</button></div><div class="rm-attr">© 高德地图</div>`;
+    this.canvas=el.querySelector(".rm-canvas");
+    el.querySelectorAll(".rm-zoom button").forEach(b=>{
+      b.onclick=e=>{e.stopPropagation();this.zoom(+b.dataset.d);};
+    });
+    this._bind();
+    this.render();
+  }
+  _bind(){
+    let drag=false,sx=0,sy=0,ox=0,oy=0;
+    const dn=e=>{drag=true;const p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;ox=0;oy=0;e.preventDefault();};
+    const mv=e=>{
+      if(!drag)return;
+      const p=e.touches?e.touches[0]:e;
+      this.cx-=(p.clientX-sx);this.cy-=(p.clientY-sy);
+      sx=p.clientX;sy=p.clientY;
+      this.render();
+    };
+    const up=()=>drag=false;
+    this.el.addEventListener("mousedown",dn);
+    window.addEventListener("mousemove",mv);
+    window.addEventListener("mouseup",up);
+    this.el.addEventListener("touchstart",dn,{passive:false});
+    this.el.addEventListener("touchmove",mv,{passive:false});
+    this.el.addEventListener("touchend",up);
+    this.el.addEventListener("wheel",e=>{
+      e.preventDefault();
+      this.zoom(e.deltaY>0?-1:1);
+    },{passive:false});
+    this._ro=new ResizeObserver(()=>this.render());
+    this._ro.observe(this.el);
+  }
+  zoom(d){
+    const zn=Math.max(14,Math.min(18,this.z+d));
+    if(zn===this.z)return;
+    const f=Math.pow(2,zn-this.z);
+    this.cx*=f;this.cy*=f;this.z=zn;
+    this.render();
+  }
+  setView(lon,lat,z){
+    if(z)this.z=z;
+    this.cx=lon2tile(lon,this.z);
+    this.cy=lat2tile(lat,this.z);
+    this.render();
+  }
+  setMarkers(list){
+    this.markers=list.map(m=>({...m,x:lon2tile(m.lon,this.z),y:lat2tile(m.lat,this.z)}));
+    this.render();
+  }
+  setPath(pts){
+    this.path=pts.map(p=>[lon2tile(p[0],this.z),lat2tile(p[1],this.z)]);
+    this.render();
+  }
+  _tileUrl(x,y){
+    return `map_tiles/${this.z}/${x}/${y}.png`;
+  }
+  _tileUrlNet(x,y){
+    const i=((x+y)%4)+1;
+    return `https://wprd0${i}.is.autonavi.com/appmaptile?x=${x}&y=${y}&z=${this.z}&lang=zh_cn&size=1&scl=1&style=7`;
+  }
+
+  animateTrack(pts, onStep, ms=200){
+    this.setPath([]);
+    const n=pts.length;
+    let i=1;
+    this._animTimer&&clearInterval(this._animTimer);
+    this._animTimer=setInterval(()=>{
+      if(i>=n){clearInterval(this._animTimer);this._animTimer=null;return;}
+      this.setPath(pts.slice(0,i+1));
+      onStep&&onStep(i,n,pts[i]);
+      i++;
+    },ms);
+  }
+  render(){
+    const w=this.el.clientWidth||600, h=this.el.clientHeight||320;
+    const left=this.cx-w/2, top=this.cy-h/2;
+    const z=this.z, ts=256;
+    const x0=Math.floor(left/ts), x1=Math.floor((left+w)/ts);
+    const y0=Math.floor(top/ts), y1=Math.floor((top+h)/ts);
+    let html="";
+    for(let x=x0;x<=x1;x++){
+      for(let y=y0;y<=y1;y++){
+        const px=x*ts-left, py=y*ts-top;
+        html+=`<img class="rm-t" src="${this._tileUrl(x,y)}" data-x="${x}" data-y="${y}" style="left:${px}px;top:${py}px" draggable="false">`;
+      }
+    }
+    // path
+    if(this.path.length>1){
+      const pts=this.path.map(([px,py])=>`${(px-left).toFixed(1)},${(py-top).toFixed(1)}`).join(" ");
+      html+=`<svg class="rm-svg" width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="#00B42A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></svg>`;
+    }
+    // markers
+    this.markers.forEach(m=>{
+      const px=m.x-left-10, py=m.y-top-10;
+      html+=`<div class="rm-mk ${m.on?"on":""}" style="left:${px}px;top:${py}px" title="${m.tip||""}">${m.label}</div>`;
+    });
+    this.canvas.innerHTML=html;
+    // 本地瓦片失败 → 高德在线
+    this.canvas.querySelectorAll("img.rm-t").forEach(img=>{
+      img.onerror=()=>{
+        if(!img.dataset.f){img.dataset.f="1";img.src=this._tileUrlNet(+img.dataset.x,+img.dataset.y);}
+        else img.style.visibility="hidden";
+      };
+    });
+  }
+}
+
+
+/* ═══ 常量 ═══ */
+const SM4_KEY=b64d("JXhWGZjmhhXN+nt8nLpNxA==");
+const CIPHER_KEY="BGfbsG9EkXz5KeCva8E0MisBeS6bhBEDId3VXeIuBoiBMZU0Mosv7PqKsvqxZ3PjkUlsjzh09Se629SWW45XP4TIUeXoLpYzgk5fAMbg0VNVnXuLH9xVzdHAeM+1qJrgvwwkwio85/DnrP1aArvVQrw3N4xd5tugqQ==";
+const APPSECRET="0h1UIfMDSc7piesRINRXXfkE";
+const BASE_LOCAL="http://60.174.215.2:8000/m-api";
+const BASE_PROXY="http://127.0.0.1:8787";
+let BASE=localStorage.getItem("yyd_base")||BASE_PROXY;
+const DEV={deviceid:"8089983D-44D0-4B26-AEA7-9DDAB2684E1D",devicename:"iPhone 16 Pro",
+  ua:"LePao/3.6.6 (iPhone; iOS 26.6; Scale/3.00)",sys:"26.6",ver:"3.6.6",platform:"ios",isapp:"app"};
+const CHECKPOINTS=[[117.596597,31.608729],[117.596941,31.608327],[117.597305,31.607937],
+  [117.596005,31.608317],[117.596259,31.608032],[117.596523,31.607543]];
+const MARK_Y=[0,1,2,3,5];
+const PRESETS={
+  qualified:{dist:3.0,dur:840,pts:50,marks:5,pace:4.67,cad:170},
+  quick:{dist:2.2,dur:30,pts:2,marks:3,pace:2.27,cad:160},
+  morning:{dist:2.6,dur:720,pts:40,marks:5,pace:4.62,cad:165}
+};
+const API_TABLE=[
+["login","appLogin","账号密码登录"],["login","getStudentInfo","学籍信息"],["login","signOut","退出登录"],
+["login","getVerCode","短信验证码"],["login","verPassword","修改密码"],["login","thirdPartyLogin","第三方登录"],
+["run","getHomeRunInfo","跑步任务"],["run","start","开始跑步"],["run","splitPointCheating","轨迹分段"],
+["run","splitPointBreakpoint","断点分段"],["run","finish","结束跑步"],["run","isStandard","标准判定"],
+["run","pauseOrGoon","暂停 / 继续"],["run","crsReocordInfoList","历史列表"],["run","crsReocordInfo","历史详情"],
+["run","myInfoCrsRunInfo","个人汇总"],["run","listXnYearXqByStudentId","学期列表"],
+["runAvoid","avoidInfo","免跑信息"],["runAvoid","crsRunAvoidSave","申请免跑"],
+["score","list","成绩列表"],["homePageApi","list","首页"],["appNewsApi","list","资讯"],
+["questionNaire","getQuestionList","问卷"],["aiSport/student","listTask","AI 体测任务"],
+["course","studMyCourseListDateList","我的课程"],["selCourse","selectCourseList/v2","选课"],
+["venue","venueHomPage","场馆首页"],["venue","submitAppointment","预约"],
+["studClub","clubList","社团"],["studExam","examList","考试"],
+["community","AppList","社区"],["feedback","save","意见反馈"],["appMatchApi","list","赛事"]
+];
+
+/* ═══ 状态 ═══ */
+const S={
+  token:"bb8b3b75-e1a7-4287-87fc-3e790b60cf15",
+  uuid:"7B6FE0BC-BDEA-4E42-839B-2C42876460F3",
+  dist:3.0, dur:840, npts:50, marks:5, pace:4.67, cad:170,
+  running:false, abort:false, timerOn:false, tab:"run",
+  thh:7, tmm:30, tdays:"1,2,3,4,5"
+};
+let LOGN=0;
+function log(msg,cls="sys"){
+  const el=document.getElementById("logbox");
+  const ts=new Date().toTimeString().slice(0,8);
+  el.insertAdjacentHTML("beforeend",`<div><span class="ts">${ts}</span><span class="${cls}">${msg}</span></div>`);
+  el.scrollTop=el.scrollHeight;LOGN++;document.getElementById("log-count").textContent=LOGN+" 条";
+}
+function clearLog(){document.getElementById("logbox").innerHTML="";LOGN=0;document.getElementById("log-count").textContent="0 条";}
+function exportLog(){const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([document.getElementById("logbox").innerText],{type:"text/plain"}));
+  a.download="yunyundong.log";a.click();}
+function msg(id,ok,text){const e=document.getElementById(id);if(!e)return;e.className="msg show "+(ok?"ok":"err");e.textContent=text;}
+
+function switchBase(v){
+  BASE = v==="direct" ? BASE_LOCAL : BASE_PROXY;
+  localStorage.setItem("yyd_base", BASE);
+  log("接口切换 → "+BASE,"warn");
+}
+function makeCtx(){
+  S.uuid=(crypto.randomUUID?crypto.randomUUID():S.uuid).toUpperCase();
+  const utc=String(Math.floor(Date.now()/1000));
+  const sign=md5(`platform=${DEV.platform}&utc=${utc}&uuid=${S.uuid}&appsecret=${APPSECRET}`);
+  return {uuid:S.uuid,utc,sign};
+}
+function headers(){
+  const c=makeCtx();
+  return {deviceid:DEV.deviceid,"user-agent":DEV.ua,sysversion:DEV.sys,"content-type":"application/json",
+    version:DEV.ver,isapp:DEV.isapp,token:S.token,"accept-encoding":"gzip, deflate",accept:"*/*",
+    devicename:DEV.devicename,platform:DEV.platform,uuid:c.uuid,sign:c.sign,utc:c.utc};
+}
+function encPayload(obj){
+  if(obj===null||obj===undefined||obj==="") return "";
+  const raw=u8(typeof obj==="string"?obj:JSON.stringify(obj));
+  return b64e(sm4ecbEnc(SM4_KEY,raw));
+}
+async function api(path,payload,gz){
+  const body={cipherKey:CIPHER_KEY,content:encPayload(payload)};
+  const url=BASE+(path.startsWith("/")?path:"/"+path);
+  log("→ POST "+path,"in");
+  try{
+    const r=await fetch(url,{method:"POST",headers:headers(),body:JSON.stringify(body)});
+    const t=await r.text();
+    log("← "+(t.length>80?t.slice(0,80)+"…":t),"out");
+    if(t.includes("401")||t.includes("认证失败")){
+      log("token 已过期或无效，请重新登录","err");
+      if(S.tab!=="auth") switchTab("auth");
+    }
+    try{
+      let out=JSON.parse(t);
+      // E22: 成功响应可能是 JSON 字符串包 SM4 密文，需解密
+      if(typeof out==="string" && out.length>16){
+        try{
+          const pt=sm4ecbDec(SM4_KEY,b64d(out));
+          out=JSON.parse(u8d(pt));
+          log("已解密响应","ok");
+        }catch(e2){
+          try{ out=JSON.parse(u8d(sm4ecbDec(SM4_KEY,b64d(out)))); }catch(e3){ /* 保持原文 */ }
+        }
+      }
+      return out;
+    }catch(e){return t;}
+  }catch(e){
+    const m=String(e&&e.message||e);
+    if(/fetch|network|Failed/i.test(m)){
+      log("请求失败 · 浏览器跨域/网络不通，已尝试 "+BASE,"err");
+      log("请先双击「启动本地代理.bat」，或改用 云运动全功能.exe 登录","warn");
+      return {code:-2,msg:"Failed to fetch（跨域）— 请开本地代理或用桌面版"};
+    }
+    log("请求失败 · "+m,"err");return {code:-1,msg:m};
+  }
+}
+
+function synth(n,dist,dur){
+  const pts=[],ts0=Math.floor(Date.now()/1000)-dur,o=[117.5966,31.6083];
+  for(let i=0;i<n;i++){
+    const t=i/(n-1);
+    const lon=o[0]+0.0008*t+(i%2?0.0003:-0.0003)*t*(dist/2.2);
+    const lat=o[1]+0.0005*t+(i%3?0.0002:-0.0002)*t*(dist/2.2);
+    pts.push({point:lon.toFixed(8)+","+lat.toFixed(8),runStatus:"1",
+      speed:(4.6+Math.random()*0.6).toFixed(2),isFence:"Y",isMock:false,
+      runMileage:(dist*1000*(i+1)/n).toFixed(4),runTime:String(Math.floor(dur*(i+1)/n)),
+      ts:String(ts0+Math.floor(dur*(i+1)/n))});
+  }
+  return pts;
+}
+function manageList(){
+  return CHECKPOINTS.map((p,i)=>({point:p[0]+","+p[1],
+    marked:MARK_Y.slice(0,S.marks).includes(i)?"Y":"N",
+    index:MARK_Y.slice(0,S.marks).includes(i)?String(i):""}));
+}
+
+/* ═══ 跑步序列 ═══ */
+async function startRun(){
+  if(S.running)return; S.running=true; S.abort=false;
+  log("开始跑步序列 · "+S.dist.toFixed(1)+"km / "+S.dur+"s / "+S.npts+" 点","warn");
+  const mark=i=>{const e=document.getElementById("st"+i);if(e){e.className="st act";setTimeout(()=>e.className="st done",180);}};
+  try{
+    mark(0);
+    const home=await api("/run/getHomeRunInfo","");
+    const info=(home&&home.data&&home.data.cralist)?home.data.cralist[0]:{id:783,raType:"T2",raRunArea:"school:run:task:169:6180:R0:4:1:783",schoolId:169};
+    log("任务 "+(info.raName||"raId "+info.id),"ok");
+    mark(1);
+    const start=await api("/run/start",{raRunArea:info.raRunArea,raType:info.raType,raId:info.id});
+    const recId=(start&&start.data&&start.data.id)||"0";
+    const recStart=(start&&start.data&&start.data.recordStartTime)||"";
+    const student=(start&&start.data&&start.data.studentId)||"25204130216";
+    log("recordId="+recId,"ok");
+    mark(2);
+    const pts=synth(S.npts,S.dist,S.dur);
+    // 真实轨迹动画：地图逐段点亮
+    try{
+      const ll=pts.map(t=>{const a=t.point.split(",").map(Number);return [a[0],a[1]]});
+      if(window._rmap){
+        window._rmap.animateTrack(ll,(i,n,cur)=>{
+          const mile=(S.dist*i/n).toFixed(2);
+          const sec=Math.floor(S.dur*i/n);
+          const cad=Math.round(S.cad+((i%5)-2));
+          const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+          g("r-live","配速 "+S.pace.toFixed(2)+" · 步频 "+cad+" · "+mile+" km · "+sec+"s");
+        },180);
+      }
+    }catch(e){log("map anim "+e.message,"err");}
+    let si=0, total=Math.ceil(S.npts/10);
+    for(let i=0;i<pts.length;i+=10){
+      if(S.abort) throw new Error("已中止");
+      const chunk=pts.slice(i,i+10);
+      if(chunk.length<2) continue;
+      const body={StepNumber:Math.floor((+chunk[chunk.length-1].runMileage - +chunk[0].runMileage)/0.8),
+        a:0,b:null,c:null,mileage:+chunk[chunk.length-1].runMileage - +chunk[0].runMileage,
+        orientationNum:0,runSteps:S.cad,cardPointList:chunk,simulateNum:0,
+        time:+chunk[chunk.length-1].runTime - +chunk[0].runTime,
+        crsRunRecordId:recId,speeds:S.pace.toFixed(2),
+        schoolId:info.schoolId||169,strides:0.8,userName:student};
+      await api("/run/splitPointCheating",body,true);
+      si++;
+      const pct=Math.min(100,((i+10)/S.npts)*100);
+      const b=document.getElementById("r-bar"); if(b) b.style.width=pct+"%";
+      const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+      g("r-pts",Math.min(i+10,S.npts)+" / "+S.npts);
+      g("r-split",si+" / "+total);
+      g("r-dist",((i+10)/S.npts*S.dist).toFixed(2)+" / "+S.dist.toFixed(2)+" km");
+      await new Promise(r=>setTimeout(r,850));
+    }
+    mark(3);
+    const fin=await api("/run/finish",{
+      recordMileage:S.dist.toFixed(2),recodeCadence:String(S.cad),
+      recodePace:S.pace.toFixed(2),deviceName:DEV.devicename,sysEdition:DEV.sys,appEdition:DEV.ver,
+      raIsStartPoint:"Y",raIsEndPoint:"Y",raRunArea:info.raRunArea,recodeDislikes:String(S.marks),
+      raId:String(info.id),raType:info.raType,id:String(recId),duration:String(S.dur),
+      recordStartTime:recStart,manageList:manageList(),remake:"1"});
+    const ok=fin&&fin.code===200;
+    log("完成 · "+(fin&&fin.msg||""), ok?"ok":"err");
+    msg("msg-run",ok,(fin&&fin.msg)||JSON.stringify(fin));
+  }catch(e){
+    log("失败 · "+e.message,"err"); msg("msg-run",false,e.message);
+  }
+  S.running=false;
+}
+function abortRun(){S.abort=true;log("已请求中止","warn");}
+function dryRun(){
+  const pts=synth(10,S.dist,S.dur);
+  const enc=encPayload({cardPointList:pts.slice(0,2),crsRunRecordId:"DRY"});
+  log("干跑预览 · content "+enc.length+" 字符","warn");
+  log(enc.slice(0,72)+"…","sys");
+  msg("msg-run",true,"载荷已生成，详见日志");
+}
+
+/* ═══ 视图 ═══ */
+function renderRun(){
+  return `
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-t">跑步控制</div>
+      <div class="card-d">滨湖校区大四男生跑 · T2 · 2.6–10 km · 06:00–23:00</div>
+      <div class="row-tight" style="margin-bottom:8px">
+        <span class="pill g">里程 2.6–10 km</span>
+        <span class="pill g">配速 3–10</span>
+        <span class="pill b">打卡 3–5</span>
+      </div>
+      <div class="slider-row"><label>距离</label><input type="range" id="s-dist" min="2.6" max="5" step="0.1" value="${S.dist}"><div class="slider-val" id="v-dist">${S.dist.toFixed(1)} km</div></div>
+      <div class="slider-row"><label>时长</label><input type="range" id="s-dur" min="600" max="1200" step="10" value="${S.dur}"><div class="slider-val" id="v-dur">${S.dur} s</div></div>
+      <div class="slider-row"><label>点数</label><input type="range" id="s-pts" min="20" max="80" step="10" value="${S.npts}"><div class="slider-val" id="v-pts">${S.npts}</div></div>
+      <div class="slider-row"><label>打卡</label><input type="range" id="s-mark" min="3" max="5" step="1" value="${S.marks}"><div class="slider-val" id="v-mark">${S.marks}</div></div>
+      <div class="slider-row"><label>配速</label><input type="range" id="s-pace" min="3.5" max="8" step="0.05" value="${S.pace}"><div class="slider-val" id="v-pace">${S.pace.toFixed(2)}</div></div>
+      <div class="slider-row"><label>步频</label><input type="range" id="s-cad" min="140" max="200" step="1" value="${S.cad}"><div class="slider-val" id="v-cad">${S.cad}</div></div>
+      <div class="seq" id="seq">
+        <div class="st" id="st0">读取任务</div>
+        <div class="st" id="st1">开始跑步</div>
+        <div class="st" id="st2">上传轨迹</div>
+        <div class="st" id="st3">完成</div>
+      </div>
+      <div class="msg" id="msg-run"></div>
+      <div class="row-tight" style="margin-top:16px">
+        <button class="btn btn-suc" onclick="startRun()" ${S.running?"disabled":""}>开始跑步</button>
+        <button class="btn btn-def" onclick="dryRun()">预览载荷</button>
+        <button class="btn btn-def" onclick="abortRun()">中止</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-t">打卡点地图</div>
+      <div class="card-d">合肥城市学院滨湖校区 · 高德地图 · 拖拽平移 / 滚轮缩放</div>
+      <div id="cp-map" class="realmap"></div>
+      <div class="legend">
+        <span><i style="background:var(--blue)"></i>打卡</span>
+        <span><i style="background:var(--t4)"></i>未采</span>
+        <span><i style="background:var(--green)"></i>轨迹</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-t">实时进度</div>
+    <div class="card-d">分段上传与里程统计</div>
+    <div class="bar"><i id="r-bar"></i></div>
+    <div class="grid g3" style="margin-top:8px">
+      <div class="kv"><span>里程</span><span id="r-dist">0.00 / ${S.dist.toFixed(2)} km</span></div>
+      <div class="kv"><span>轨迹点</span><span id="r-pts">0 / ${S.npts}</span></div>
+      <div class="kv"><span>分段</span><span id="r-split">0 / ${Math.ceil(S.npts/10)}</span></div>
+    </div>
+  </div>`;
+}
+function drawMap(){
+  const el=document.getElementById("cp-map"); if(!el) return;
+  if(!window._rmap){
+    window._rmap=new RealMap(el,{lon:117.5966,lat:31.6083,z:17});
+  }
+  const marks=CHECKPOINTS.map((c,i)=>({
+    lon:c[0],lat:c[1],label:String(i+1),on:MARK_Y.slice(0,S.marks).includes(i),
+    tip:"点"+(i+1)+(MARK_Y.slice(0,S.marks).includes(i)?" · 打卡":"")
+  }));
+  window._rmap.setMarkers(marks);
+  window._rmap.setPath(synth(S.npts,S.dist,S.dur).map(t=>{
+    const a=t.point.split(",").map(Number); return [a[0],a[1]];
+  }));
+}
+
+function bindSliders(){
+  const map=[["s-dist","v-dist",v=>S.dist=+v,v=>S.dist.toFixed(1)+" km"],
+    ["s-dur","v-dur",v=>S.dur=+v,v=>S.dur+" s"],
+    ["s-pts","v-pts",v=>S.npts=+v,v=>String(S.npts)],
+    ["s-mark","v-mark",v=>S.marks=+v,v=>String(S.marks)],
+    ["s-pace","v-pace",v=>S.pace=+v,v=>S.pace.toFixed(2)],
+    ["s-cad","v-cad",v=>S.cad=+v,v=>String(S.cad)]];
+  map.forEach(([id,vid,set,fmt])=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.oninput=()=>{set(el.value);document.getElementById(vid).textContent=fmt();drawMap();};
+  });
+}
+
+function renderAuth(){
+  return `<div class="grid g2">
+    <div class="card">
+      <div class="card-t">账号信息</div>
+      <div class="card-d">支持 token 直连或学号密码登录</div>
+      <label>学号 / 账号</label><input id="i-user" value="25204130216" placeholder="请输入学号">
+      <label>密码</label><input id="i-pass" type="password" placeholder="用于自动获取 token">
+      <label>token</label><input id="i-token" value="${S.token}">
+      <div class="row">
+        <div><label>schoolId</label><input value="169"></div>
+        <div><label>deviceid</label><input value="${DEV.deviceid}" style="font-family:var(--mono);font-size:12px"></div>
+      </div>
+      <label>deviceName</label><input value="${DEV.devicename}">
+      <div class="row-tight" style="margin-top:16px">
+        <button class="btn btn-pri" onclick="testToken()">验证 token</button>
+        <button class="btn btn-def" onclick="doLogin()">账号登录</button>
+        <button class="btn btn-def" onclick="saveCfg()">保存配置</button>
+      </div>
+      <div class="msg" id="msg-auth"></div>
+    </div>
+    <div class="card">
+      <div class="card-t">请求签名</div>
+      <div class="card-d">sign = MD5(platform &amp; utc &amp; uuid &amp; appsecret)</div>
+      <div class="kv"><span>appsecret</span><span class="mono-sm">${APPSECRET}</span></div>
+      <div class="kv"><span>version</span><span>3.6.6</span></div>
+      <div class="kv"><span>platform</span><span>ios</span></div>
+      <label>当前签名因子</label>
+      <div class="code" id="sign-prev"></div>
+      <button class="btn btn-def btn-sm" style="margin-top:12px" onclick="render()">刷新签名</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-t">请求头预览</div>
+    <div class="card-d">发包时自动附加</div>
+    <div class="code" id="hdr-prev"></div>
+  </div>`;
+}
+function fillAuth(){
+  const c=makeCtx();
+  const raw=`platform=${DEV.platform}&utc=${c.utc}&uuid=${c.uuid}&appsecret=${APPSECRET}`;
+  const e1=document.getElementById("sign-prev");
+  if(e1) e1.textContent=raw+"\n\nsign = "+c.sign;
+  const e2=document.getElementById("hdr-prev");
+  if(e2) e2.textContent=Object.entries(headers()).map(([k,v])=>k+": "+v).join("\n");
+}
+async function testToken(){
+  const r=await api("/login/getStudentInfo","");
+  const ok=r&&r.code===200;
+  msg("msg-auth",ok,ok?("token 有效 · "+((r.data&&r.data.nickName)||"")):("token 无效 · "+((r&&r.msg)||"")));
+  document.getElementById("led-auth").className="dot "+(ok?"":"err");
+}
+async async function doLogin(){
+  const u=document.getElementById("i-user").value, p=document.getElementById("i-pass").value;
+  if(!u||!p){msg("msg-auth",false,"请输入学号和密码");return;}
+  const r=await api("/login/appLogin",{userName:u,password:p,schoolId:"169",type:"1"});
+  const d=(r&&r.data)||{};
+  const tok=d.token||d.Token||d.accessToken||d.access_token||"";
+  if(r&&r.code===200&&tok){
+    S.token=tok;
+    try{localStorage.setItem("yyd_token",tok);localStorage.setItem("yyd_user",u);}catch(e){}
+    const ti=document.getElementById("i-token"); if(ti) ti.value=tok;
+    document.getElementById("led-auth").className="dot";
+    msg("msg-auth",true,"登录成功 token="+tok.slice(0,8)+"…");
+    log("登录成功，token 已更新","ok");
+  }else{
+    msg("msg-auth",false,(r&&r.msg)||JSON.stringify(r||{}).slice(0,100));
+    log("登录失败 · "+((r&&r.msg)||"no token in response"),"err");
+  }
+}
+function saveCfg(){
+  const u=document.getElementById("i-user")?document.getElementById("i-user").value:"";
+  const p=document.getElementById("i-pass")?document.getElementById("i-pass").value:"";
+  const t=document.getElementById("i-token")?document.getElementById("i-token").value:"";
+  if(u) localStorage.setItem("yyd_user",u);
+  if(t){S.token=t;localStorage.setItem("yyd_token",t);}
+  if(p) localStorage.setItem("yyd_pw","1"); // 只记「已填过」，不存明文
+  log("配置已保存"+(p?"（密码不存明文）":"")+"","ok");
+  msg("msg-auth",true,"配置已保存");
+}
+
+function renderTimer(){
+  return `<div class="grid g2">
+    <div class="card">
+      <div class="card-t">定时挂机</div>
+      <div class="card-d">到点自动执行一次合格跑，需保持页面打开</div>
+      <div class="row-tight" style="margin:12px 0">
+        <label style="margin:0;display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="t-on" ${S.timerOn?"checked":""} style="width:auto" onchange="S.timerOn=this.checked">
+          启用定时
+        </label>
+      </div>
+      <div class="row">
+        <div><label>时刻</label><input type="time" id="t-time" value="${String(S.thh).padStart(2,"0")}:${String(S.tmm).padStart(2,"0")}"></div>
+        <div><label>星期（1-7）</label><input id="t-days" value="${S.tdays}"></div>
+      </div>
+      <button class="btn btn-pri" style="margin-top:16px" onclick="saveTimer()">保存定时</button>
+      <div class="msg" id="msg-timer"></div>
+    </div>
+    <div class="card">
+      <div class="card-t">当前计划</div>
+      <div class="kv"><span>状态</span><span id="t-state">${S.timerOn?"已启用":"未启用"}</span></div>
+      <div class="kv"><span>触发时刻</span><span>${String(S.thh).padStart(2,"0")}:${String(S.tmm).padStart(2,"0")}</span></div>
+      <div class="kv"><span>重复</span><span>周 ${S.tdays}</span></div>
+      <div class="kv"><span>动作</span><span>合格跑 ${S.dist.toFixed(1)} km</span></div>
+      <div class="hint">也可以使用桌面版 <b>云运动定时跑.exe</b> 后台挂机，支持计划任务开机自启。</div>
+    </div>
+  </div>`;
+}
+function saveTimer(){
+  const t=document.getElementById("t-time").value.split(":");
+  S.thh=+t[0]; S.tmm=+t[1]; S.tdays=document.getElementById("t-days").value;
+  log(`定时已设 ${S.thh}:${String(S.tmm).padStart(2,"0")} · 周 ${S.tdays} · ${S.timerOn?"启用":"关闭"}`,"warn");
+  msg("msg-timer",true,"定时已保存");
+}
+setInterval(()=>{
+  const now=new Date();
+  if(S.timerOn && now.getHours()===S.thh && now.getMinutes()===S.tmm && now.getSeconds()<3){
+    if(!S._fired){S._fired=true;log("定时触发，开始跑步","warn");startRun();}
+  }else if(now.getMinutes()!==S.tmm) S._fired=false;
+},1000);
+
+function renderAPI(){
+  return `<div class="card">
+    <div class="card-t">接口调试</div>
+    <div class="card-d">m-api 网关 · ${BASE}</div>
+    <div class="row">
+      <div><label>接口路径</label><input id="api-p" value="/run/getHomeRunInfo"></div>
+    </div>
+    <label>请求体 JSON（留空则无载荷）</label>
+    <textarea id="api-b">{}</textarea>
+    <div class="row-tight" style="margin-top:12px">
+      <button class="btn btn-pri" onclick="callAPI()">发送请求</button>
+      <button class="btn btn-def" onclick="copyCurl()">复制 cURL</button>
+    </div>
+    <label>响应</label>
+    <div class="code" id="api-out">// 结果将显示在这里</div>
+    <table style="margin-top:16px">
+      <thead><tr><th>#</th><th>模块</th><th>接口</th><th>说明</th><th></th></tr></thead>
+      <tbody>${API_TABLE.map((r,i)=>`<tr>
+        <td style="color:var(--t3)">${String(i+1).padStart(2,"0")}</td>
+        <td class="m">${r[0]}</td><td class="m" style="color:var(--blue)">${r[0]}/${r[1]}</td><td>${r[2]}</td>
+        <td><button class="btn btn-def btn-sm" onclick="quickCall('${r[0]}/${r[1]}')">调用</button></td>
+      </tr>`).join("")}</tbody>
+    </table>
+  </div>`;
+}
+async function callAPI(){
+  const p=document.getElementById("api-p").value;
+  let body=document.getElementById("api-b").value.trim();
+  body=body?JSON.parse(body):"";
+  const r=await api(p,body,/splitPoint/.test(p));
+  document.getElementById("api-out").textContent=JSON.stringify(r,null,2);
+}
+async function quickCall(p){
+  document.getElementById("api-p").value="/"+p;
+  document.getElementById("api-b").value=/start|finish|save|login/i.test(p)?"{}":"";
+  callAPI();
+}
+function copyCurl(){
+  const p=document.getElementById("api-p").value;
+  const h=headers();
+  const curl=`curl -X POST '${BASE}${p}' \\\n`+
+    Object.entries(h).map(([k,v])=>`  -H '${k}: ${v}'`).join(" \\\n")+
+    ` \\\n  -d '{"cipherKey":"…","content":""}'`;
+  navigator.clipboard.writeText(curl);
+  log("cURL 已复制","ok");
+}
+
+function renderCrypto(){
+  return `<div class="grid g2">
+    <div class="card">
+      <div class="card-t">SM4 加解密</div>
+      <div class="card-d">国密 SM4 · ECB · PKCS7 · content 字段</div>
+      <label>密钥（Base64）</label><input id="c-key" value="JXhWGZjmhhXN+nt8nLpNxA==" style="font-family:var(--mono);font-size:12px">
+      <label>明文 / 密文</label><textarea id="c-in">{"type":"1","schoolId":"169"}</textarea>
+      <div class="row-tight" style="margin-top:12px">
+        <button class="btn btn-pri" onclick="doEnc()">加密</button>
+        <button class="btn btn-def" onclick="doDec()">解密</button>
+        <button class="btn btn-def" onclick="doTV()">测试向量</button>
+      </div>
+      <label>结果</label>
+      <div class="code" id="c-out">// 就绪</div>
+      <div class="msg" id="msg-cry"></div>
+    </div>
+    <div class="card">
+      <div class="card-t">协议说明</div>
+      <div class="card-d">请求封装与响应解密</div>
+      <div class="code" style="max-height:none">请求体
+{
+  "cipherKey": "SM2(sm4_key) 固定密文",
+  "content":   "Base64(SM4-ECB(PKCS7(json)))"
+}
+
+splitPointCheating
+  json → gzip → SM4-ECB → Base64
+
+响应
+  gzip → JSON字符串(b64) → SM4 解密 → json
+
+sign
+  MD5(platform & utc & uuid & appsecret)
+  appsecret = 0h1UIfMDSc7piesRINRXXfkE</div>
+    </div>
+  </div>`;
+}
+function doEnc(){
+  try{
+    const k=b64d(document.getElementById("c-key").value.trim());
+    const pt=u8(document.getElementById("c-in").value);
+    const ct=sm4ecbEnc(k,pt);
+    document.getElementById("c-out").textContent=b64e(ct);
+    msg("msg-cry",true,"加密成功 · "+ct.length+" 字节");
+  }catch(e){msg("msg-cry",false,e.message);}
+}
+function doDec(){
+  try{
+    const k=b64d(document.getElementById("c-key").value.trim());
+    const ct=b64d(document.getElementById("c-in").value.trim());
+    document.getElementById("c-out").textContent=u8d(sm4ecbDec(k,ct));
+    msg("msg-cry",true,"解密成功");
+  }catch(e){msg("msg-cry",false,e.message);}
+}
+function doTV(){
+  const k=Uint8Array.from([0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10]);
+  const hex=[...sm4blk(sm4ks(k),k)].map(v=>v.toString(16).padStart(2,"0")).join("");
+  const ok=hex==="681edf34d206965e86b3e94f536e4246";
+  document.getElementById("c-out").textContent=
+    "GB/T 32907 测试向量\n期望 681edf34d206965e86b3e94f536e4246\n实际 "+hex+"\n\n"+(ok?"通过":"失败");
+  msg("msg-cry",ok,ok?"测试向量通过":"测试向量失败");
+}
+
+function renderTrack(){
+  const pts=synth(S.npts,S.dist,S.dur).slice(0,10);
+  return `<div class="card">
+    <div class="card-t">轨迹编辑器</div>
+    <div class="card-d">每 10 个点打包一次 splitPointCheating</div>
+    <table>
+      <thead><tr><th>#</th><th>坐标</th><th>里程</th><th>时间</th><th>配速</th></tr></thead>
+      <tbody>
+        ${pts.map((p,i)=>`<tr>
+          <td style="color:var(--t3)">${i+1}</td>
+          <td class="m">${p.point}</td>
+          <td class="m">${p.runMileage}</td>
+          <td class="m">${p.runTime}s</td>
+          <td class="m">${p.speed}</td>
+        </tr>`).join("")}
+        <tr><td colspan="5" style="color:var(--t3)">共 ${S.npts} 点，此处预览前 10 条</td></tr>
+      </tbody>
+    </table>
+    <div class="row-tight" style="margin-top:14px">
+      <button class="btn btn-def" onclick="render()">重新生成</button>
+    </div>
+    <div class="hint">isFence=Y · isMock=false · 字段结构与官方客户端一致</div>
+  </div>`;
+}
+
+function renderHist(){
+  return `<div class="grid g2">
+    <div class="card">
+      <div class="card-t">跑步历史</div>
+      <div class="card-d">最近记录 · sumKm 5.71</div>
+      <table>
+        <thead><tr><th>时间</th><th>里程</th><th>配速</th><th>结果</th></tr></thead>
+        <tbody>
+          <tr><td class="m">2026-09-24 22:59</td><td class="m">3.00 km</td><td class="m">4.67</td><td class="ok">合格</td></tr>
+          <tr><td class="m">2026-09-24 22:40</td><td class="m">2.20 km</td><td class="m">2.27</td><td class="er">不合格</td></tr>
+        </tbody>
+      </table>
+      <button class="btn btn-def btn-sm" style="margin-top:14px" onclick="api('/run/crsReocordInfoList',{tableName:'crs_run_record169'})">刷新历史</button>
+    </div>
+    <div class="card">
+      <div class="card-t">成绩概览</div>
+      <div class="card-d">本学期跑步统计</div>
+      <div class="kv"><span>已合格次数</span><span>1 / 50</span></div>
+      <div class="kv"><span>累计里程</span><span>5.71 km</span></div>
+      <div class="kv"><span>今日里程</span><span>5.71 km</span></div>
+      <div class="kv"><span>任务状态</span><span style="color:var(--green)">进行中</span></div>
+      <div class="bar"><i style="width:2%"></i></div>
+      <div class="hint">目标 50 次 · 当前 1 次</div>
+    </div>
+  </div>`;
+}
+
+const VIEWS={run:renderRun,auth:renderAuth,timer:renderTimer,api:renderAPI,crypto:renderCrypto,track:renderTrack,hist:renderHist};
+function render(){
+  document.getElementById("main").innerHTML=(VIEWS[S.tab]||renderRun)();
+  if(S.tab==="run"){drawMap();bindSliders();}
+  if(S.tab==="auth") fillAuth();
+}
+function switchTab(t){
+  S.tab=t;
+  document.querySelectorAll(".nav-i[data-tab]").forEach(n=>n.classList.toggle("on",n.dataset.tab===t));
+  render();
+}
+document.querySelectorAll(".nav-i[data-tab]").forEach(n=>n.onclick=()=>switchTab(n.dataset.tab));
+document.querySelectorAll(".nav-i[data-preset]").forEach(n=>n.onclick=()=>{
+  const p=n.dataset.preset;
+  if(PRESETS[p]){Object.assign(S,PRESETS[p]);switchTab("run");log("已载入预设 "+p,"warn");}
+  else if(p==="copycfg"){
+    const cfg={token:S.token,dist_km:S.dist,duration_s:S.dur,n_points:S.npts,marks:S.marks,pace:S.pace,cadence:S.cad};
+    navigator.clipboard.writeText(JSON.stringify(cfg,null,2));
+    log("配置已复制","ok");
+  }
+});
+
+setInterval(()=>{
+  document.getElementById("clock").textContent=new Date().toTimeString().slice(0,8);
+},1000);
+
+/* 启动 */
+log("云运动工作台已启动 · LePao 3.6.6","ok");
+try{
+  const k=Uint8Array.from([0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef,0xfe,0xdc,0xba,0x98,0x76,0x54,0x32,0x10]);
+  const hex=[...sm4blk(sm4ks(k),k)].map(v=>v.toString(16).padStart(2,"0")).join("");
+  log("SM4 测试向量 "+(hex==="681edf34d206965e86b3e94f536e4246"?"通过":"失败 "+hex), hex==="681edf34d206965e86b3e94f536e4246"?"ok":"err");
+}catch(e){log("SM4 自检异常: "+e.message,"err");}
+// 过期 token 检测
+if(/^[0-9a-f]{8}-/.test(S.token)){ /* 借用格式判断：旧 UUID token 可能过期 */
+  log("提示：若请求 401，请到「账号登录」重新登录获取 token","warn");
+}
+render();
+</script>
+</body>
+</html>

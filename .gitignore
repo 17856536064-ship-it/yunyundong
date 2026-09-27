@@ -1,0 +1,25 @@
+# secrets
+yunyundong_config.json
+*.token
+.env
+
+# captures / binaries
+*.har
+*.ipa
+*.exe
+*.zip
+*.pyc
+__pycache__/
+
+# probes / patches / backups
+_*.py
+_*.js
+*.旧版备份
+build*/
+dist*/
+map_tiles/
+yunyundong-repo/
+
+# local
+*.log
+.ipynb_checkpoints/
