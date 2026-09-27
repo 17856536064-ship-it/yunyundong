@@ -10,25 +10,25 @@
 
 ### 1. 一键跑步 · 真实 GPS 轨迹
 
-![一键跑步](docs/feat-run.png)
+![一键跑步](docs/feat-run.jpg)
 
 > 红字说明：真实 GPS 轨迹生成 · 打卡点自动踩点 · SM4 加密上传 · 一键合格跑
 
 ### 2. 历史真实轨迹复现
 
-![历史轨迹复现](docs/feat-replay.png)
+![历史轨迹复现](docs/feat-replay.jpg)
 
 > 红字说明：选一次历史跑步 · 真实 GPS 轨迹 50 点 · 按原轨迹完整重放 · 坐标/时间完全还原
 
 ### 3. 多账户批量 · 学校切换
 
-![多账户](docs/feat-accounts.png)
+![多账户](docs/feat-accounts.jpg)
 
 > 红字说明：批量账号管理 · 一键批量跑步 · 随机设备指纹 · 切换 90+ 学校
 
 ### 4. SM4 国密加解密
 
-![加解密](docs/feat-crypto.png)
+![加解密](docs/feat-crypto.jpg)
 
 > 红字说明：SM4-ECB 国密加密 · SM2 包 SM4 密钥 · 自动签名 MD5 · 响应自动解密
 
@@ -38,7 +38,7 @@
 
 | 任务卡 | 跑步 | 历史复现 | 多账户 |
 |--------|------|----------|--------|
-| ![首页](docs/screenshot-home.png) | ![跑步](docs/screenshot-run.png) | ![复现](docs/screenshot-replay.png) | ![多账户](docs/screenshot-accounts.png) |
+| ![首页](docs/screenshot-home.jpg) | ![跑步](docs/screenshot-run.jpg) | ![复现](docs/screenshot-replay.jpg) | ![多账户](docs/screenshot-accounts.jpg) |
 
 ---
 
