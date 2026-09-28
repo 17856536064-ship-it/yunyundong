@@ -12,7 +12,7 @@ from yundong_run import (
     DEVICE_NAME, SYS_EDITION, APP_EDITION,
 )
 
-# 滨湖校区 6 个打卡点（getHomeRunInfo.points，E 现场拉取）
+# 主校区 6 个打卡点（getHomeRunInfo.points，E 现场拉取）
 CHECKPOINTS = [
     (117.596597, 31.608729),
     (117.596941, 31.608327),
@@ -127,7 +127,7 @@ def run_once():
     student = start["data"].get("studentId", "")
     meta = {
         "crsRunRecordId": rec_id,
-        "schoolId": info.get("schoolId", 169),
+        "schoolId": info.get("schoolId", 100),
         "userName": student,
         "strides": STRIDES,
         "speeds": f"{PACE:.2f}",

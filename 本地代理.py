@@ -6,7 +6,7 @@ from __future__ import annotations
 import http.server, json, socketserver, urllib.request, urllib.error
 
 PORT = 8787
-UPSTREAM = "http://60.174.215.2:8000"
+UPSTREAM = "http://192.0.2.10:8000"
 
 class H(http.server.BaseHTTPRequestHandler):
     def _cors(self):

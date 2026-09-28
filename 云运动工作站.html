@@ -474,10 +474,10 @@ class RealMap{
 const SM4_KEY=b64d("JXhWGZjmhhXN+nt8nLpNxA==");
 const CIPHER_KEY="BGfbsG9EkXz5KeCva8E0MisBeS6bhBEDId3VXeIuBoiBMZU0Mosv7PqKsvqxZ3PjkUlsjzh09Se629SWW45XP4TIUeXoLpYzgk5fAMbg0VNVnXuLH9xVzdHAeM+1qJrgvwwkwio85/DnrP1aArvVQrw3N4xd5tugqQ==";
 const APPSECRET="0h1UIfMDSc7piesRINRXXfkE";
-const BASE_LOCAL="http://60.174.215.2:8000/m-api";
+const BASE_LOCAL="http://192.0.2.10:8000/m-api";
 const BASE_PROXY="http://127.0.0.1:8787";
 let BASE=localStorage.getItem("yyd_base")||BASE_PROXY;
-const DEV={deviceid:"8089983D-44D0-4B26-AEA7-9DDAB2684E1D",devicename:"iPhone 16 Pro",
+const DEV={deviceid:"00000000-0000-0000-0000-000000000000",devicename:"iPhone 16 Pro",
   ua:"LePao/3.6.6 (iPhone; iOS 26.6; Scale/3.00)",sys:"26.6",ver:"3.6.6",platform:"ios",isapp:"app"};
 const CHECKPOINTS=[[117.596597,31.608729],[117.596941,31.608327],[117.597305,31.607937],
   [117.596005,31.608317],[117.596259,31.608032],[117.596523,31.607543]];
@@ -505,7 +505,7 @@ const API_TABLE=[
 
 /* ═══ 状态 ═══ */
 const S={
-  token:"bb8b3b75-e1a7-4287-87fc-3e790b60cf15",
+  token:"00000000-0000-0000-0000-000000000000",
   uuid:"7B6FE0BC-BDEA-4E42-839B-2C42876460F3",
   dist:3.0, dur:840, npts:50, marks:5, pace:4.67, cad:170,
   running:false, abort:false, timerOn:false, tab:"run",
@@ -610,13 +610,13 @@ async function startRun(){
   try{
     mark(0);
     const home=await api("/run/getHomeRunInfo","");
-    const info=(home&&home.data&&home.data.cralist)?home.data.cralist[0]:{id:783,raType:"T2",raRunArea:"school:run:task:169:6180:R0:4:1:783",schoolId:169};
+    const info=(home&&home.data&&home.data.cralist)?home.data.cralist[0]:{id:1,raType:"T2",raRunArea:"school:run:task:100:100:R0:4:1:1",schoolId:100};
     log("任务 "+(info.raName||"raId "+info.id),"ok");
     mark(1);
     const start=await api("/run/start",{raRunArea:info.raRunArea,raType:info.raType,raId:info.id});
     const recId=(start&&start.data&&start.data.id)||"0";
     const recStart=(start&&start.data&&start.data.recordStartTime)||"";
-    const student=(start&&start.data&&start.data.studentId)||"25204130216";
+    const student=(start&&start.data&&start.data.studentId)||"20230000001";
     log("recordId="+recId,"ok");
     mark(2);
     const pts=synth(S.npts,S.dist,S.dur);
@@ -643,7 +643,7 @@ async function startRun(){
         orientationNum:0,runSteps:S.cad,cardPointList:chunk,simulateNum:0,
         time:+chunk[chunk.length-1].runTime - +chunk[0].runTime,
         crsRunRecordId:recId,speeds:S.pace.toFixed(2),
-        schoolId:info.schoolId||169,strides:0.8,userName:student};
+        schoolId:info.schoolId||100,strides:0.8,userName:student};
       await api("/run/splitPointCheating",body,true);
       si++;
       const pct=Math.min(100,((i+10)/S.npts)*100);
@@ -684,7 +684,7 @@ function renderRun(){
   <div class="grid g2">
     <div class="card">
       <div class="card-t">跑步控制</div>
-      <div class="card-d">滨湖校区大四男生跑 · T2 · 2.6–10 km · 06:00–23:00</div>
+      <div class="card-d">主校区高年级男生跑 · T2 · 2.6–10 km · 06:00–23:00</div>
       <div class="row-tight" style="margin-bottom:8px">
         <span class="pill g">里程 2.6–10 km</span>
         <span class="pill g">配速 3–10</span>
@@ -711,7 +711,7 @@ function renderRun(){
     </div>
     <div class="card">
       <div class="card-t">打卡点地图</div>
-      <div class="card-d">合肥城市学院滨湖校区 · 高德地图 · 拖拽平移 / 滚轮缩放</div>
+      <div class="card-d">XX学院主校区 · 高德地图 · 拖拽平移 / 滚轮缩放</div>
       <div id="cp-map" class="realmap"></div>
       <div class="legend">
         <span><i style="background:var(--blue)"></i>打卡</span>
@@ -764,11 +764,11 @@ function renderAuth(){
     <div class="card">
       <div class="card-t">账号信息</div>
       <div class="card-d">支持 token 直连或学号密码登录</div>
-      <label>学号 / 账号</label><input id="i-user" value="25204130216" placeholder="请输入学号">
+      <label>学号 / 账号</label><input id="i-user" value="20230000001" placeholder="请输入学号">
       <label>密码</label><input id="i-pass" type="password" placeholder="用于自动获取 token">
       <label>token</label><input id="i-token" value="${S.token}">
       <div class="row">
-        <div><label>schoolId</label><input value="169"></div>
+        <div><label>schoolId</label><input value="100"></div>
         <div><label>deviceid</label><input value="${DEV.deviceid}" style="font-family:var(--mono);font-size:12px"></div>
       </div>
       <label>deviceName</label><input value="${DEV.devicename}">
@@ -813,7 +813,7 @@ async function testToken(){
 async async function doLogin(){
   const u=document.getElementById("i-user").value, p=document.getElementById("i-pass").value;
   if(!u||!p){msg("msg-auth",false,"请输入学号和密码");return;}
-  const r=await api("/login/appLogin",{userName:u,password:p,schoolId:"169",type:"1"});
+  const r=await api("/login/appLogin",{userName:u,password:p,schoolId:"100",type:"1"});
   const d=(r&&r.data)||{};
   const tok=d.token||d.Token||d.accessToken||d.access_token||"";
   if(r&&r.code===200&&tok){
@@ -933,7 +933,7 @@ function renderCrypto(){
       <div class="card-t">SM4 加解密</div>
       <div class="card-d">国密 SM4 · ECB · PKCS7 · content 字段</div>
       <label>密钥（Base64）</label><input id="c-key" value="JXhWGZjmhhXN+nt8nLpNxA==" style="font-family:var(--mono);font-size:12px">
-      <label>明文 / 密文</label><textarea id="c-in">{"type":"1","schoolId":"169"}</textarea>
+      <label>明文 / 密文</label><textarea id="c-in">{"type":"1","schoolId":"100"}</textarea>
       <div class="row-tight" style="margin-top:12px">
         <button class="btn btn-pri" onclick="doEnc()">加密</button>
         <button class="btn btn-def" onclick="doDec()">解密</button>
@@ -1027,7 +1027,7 @@ function renderHist(){
           <tr><td class="m">2026-09-24 22:40</td><td class="m">2.20 km</td><td class="m">2.27</td><td class="er">不合格</td></tr>
         </tbody>
       </table>
-      <button class="btn btn-def btn-sm" style="margin-top:14px" onclick="api('/run/crsReocordInfoList',{tableName:'crs_run_record169'})">刷新历史</button>
+      <button class="btn btn-def btn-sm" style="margin-top:14px" onclick="api('/run/crsReocordInfoList',{tableName:'crs_run_record100'})">刷新历史</button>
     </div>
     <div class="card">
       <div class="card-t">成绩概览</div>

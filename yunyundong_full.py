@@ -67,13 +67,13 @@ def sm4_dec(key,data):
 SM4_KEY=base64.b64decode("JXhWGZjmhhXN+nt8nLpNxA==")
 CIPHER_KEY="BGfbsG9EkXz5KeCva8E0MisBeS6bhBEDId3VXeIuBoiBMZU0Mosv7PqKsvqxZ3PjkUlsjzh09Se629SWW45XP4TIUeXoLpYzgk5fAMbg0VNVnXuLH9xVzdHAeM+1qJrgvwwkwio85/DnrP1aArvVQrw3N4xd5tugqQ=="
 APPSECRET="0h1UIfMDSc7piesRINRXXfkE"
-M_API="http://60.174.215.2:8000/m-api"
+M_API="http://192.0.2.10:8000/m-api"
 S_API="https://sports.aiyyd.com:9011/api/app"
 APP_VER="3.6.6"
 UA=f"LePao/{APP_VER} (iPhone; iOS 26.6; Scale/3.00)"
 
 DEVICES=[
-    ("8089983D-44D0-4B26-AEA7-9DDAB2684E1D","iPhone 16 Pro"),
+    ("00000000-0000-0000-0000-000000000000","iPhone 16 Pro"),
     ("A3B1C2D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D","iPhone 15"),
     ("B4C5D6E7-F8A9-4B0C-1D2E-3F4A5B6C7D8E","iPhone 14 Pro Max"),
     ("C5D6E7F8-A9B0-4C1D-2E3F-4A5B6C7D8E9F","iPhone 13"),
@@ -88,8 +88,8 @@ DEVICES=[
 ]
 
 DEFAULT_CFG={
-    "token":"bb8b3b75-e1a7-4287-87fc-3e790b60cf15","username":"25204130216","password":"",
-    "school_id":"169","school_name":"合肥城市学院","school_url":M_API,
+    "token":"00000000-0000-0000-0000-000000000000","username":"20230000001","password":"",
+    "school_id":"100","school_name":"XX学院","school_url":M_API,
     "deviceid":DEVICES[0][0],"devicename":DEVICES[0][1],"platform":"ios",
     "dist_km":3.0,"duration_s":840,"n_points":50,"marks":5,"pace":4.67,"cadence":170,"strides":0.8,
     "drift":True,"multi_route":True,"run_mode":"track","quick_extra_km":0.0,
@@ -274,7 +274,7 @@ class API:
         if not sc: return None
         row=next((x for x in sc if str(x.get("schoolCode"))==str(school_code)),None) if school_code else None
         if not row: row=random.choice(sc)
-        self.cfg["school_id"]=str(row.get("schoolCode") or "169")
+        self.cfg["school_id"]=str(row.get("schoolCode") or "100")
         self.cfg["school_name"]=row.get("schoolName") or self.cfg["school_id"]
         url=row.get("schoolUrl") or M_API
         if not url.startswith("http"): url="http://"+url
@@ -336,7 +336,7 @@ class API:
             "cardPointList":points,"simulateNum":0,
             "time":float(points[-1]["runTime"])-float(points[0]["runTime"]),
             "crsRunRecordId":meta["crsRunRecordId"],"speeds":meta.get("speeds","5.50"),
-            "schoolId":meta.get("schoolId",169),"strides":meta.get("strides",0.8),
+            "schoolId":meta.get("schoolId",100),"strides":meta.get("strides",0.8),
             "userName":meta.get("userName",self.cfg["username"])}
         return self.call("/run/splitPointCheating",body,gz=True)
     def finish(self,payload): return self.call("/run/finish",payload)
@@ -740,7 +740,7 @@ table.tb tr:hover td{background:rgba(177,186,196,.04)}
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <input id="accUser" placeholder="学号" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--fg);min-width:140px">
       <input id="accPass" placeholder="密码" type="password" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--fg);min-width:140px">
-      <input id="accSchool" placeholder="schoolId" value="169" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--fg);width:90px">
+      <input id="accSchool" placeholder="schoolId" value="100" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--fg);width:90px">
       <button class="btn pri" onclick="accAdd()">＋ 添加</button>
       <button class="btn" onclick="accRefresh()">⟳ 刷新</button>
       <button class="btn" onclick="batchRun()">▶ 批量跑步</button>
@@ -910,7 +910,7 @@ async function accRefresh(){
   el.innerHTML=h;
 }
 async function accAdd(){
-  const u=$('accUser').value.trim(), p=$('accPass').value, sc=$('accSchool').value.trim()||'169';
+  const u=$('accUser').value.trim(), p=$('accPass').value, sc=$('accSchool').value.trim()||'100';
   if(!u){toast('学号不能为空','err');return}
   const r=await api('/api/account_add',{username:u,password:p,school_id:sc});
   if(r.ok){toast('已添加'); $('accUser').value=''; $('accPass').value=''; accRefresh()}
@@ -1459,7 +1459,7 @@ def run_gui(cfg,api):
             if any(a.get("username")==u for a in accs):
                 return {"ok":False,"error":"账号已存在"}
             acc={"username":u,"password":str(b.get("password") or ""),
-                 "school_id":str(b.get("school_id") or cfg.get("school_id") or "169"),
+                 "school_id":str(b.get("school_id") or cfg.get("school_id") or "100"),
                  "school_url":b.get("school_url") or cfg.get("school_url") or "",
                  "school_name":b.get("school_name") or cfg.get("school_name") or "",
                  "token":""}
@@ -1610,7 +1610,7 @@ def run_gui(cfg,api):
                             "runTime":str(pt.get("runTime") or "0"),
                             "ts":str(pt.get("ts") or int(time.time())),
                         })
-                    meta_s={"crsRunRecordId":rec_id,"schoolId":card.get("schoolId",169),
+                    meta_s={"crsRunRecordId":rec_id,"schoolId":card.get("schoolId",100),
                             "userName":student,"strides":float(cfg.get("strides",0.8) or 0.8),
                             "speeds":str(meta.get("recodePace") or cfg.get("pace") or 5.5),
                             "cad":int(cfg.get("cadence",170) or 170)}

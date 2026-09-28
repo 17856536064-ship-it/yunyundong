@@ -87,7 +87,7 @@ def sm4_dec(key, data):
 SM4_KEY = base64.b64decode("JXhWGZjmhhXN+nt8nLpNxA==")
 CIPHER_KEY = "BGfbsG9EkXz5KeCva8E0MisBeS6bhBEDId3VXeIuBoiBMZU0Mosv7PqKsvqxZ3PjkUlsjzh09Se629SWW45XP4TIUeXoLpYzgk5fAMbg0VNVnXuLH9xVzdHAeM+1qJrgvwwkwio85/DnrP1aArvVQrw3N4xd5tugqQ=="
 APPSECRET = "0h1UIfMDSc7piesRINRXXfkE"
-BASE = "http://60.174.215.2:8000/m-api"
+BASE = "http://192.0.2.10:8000/m-api"
 APP_EDITION = "3.6.6"
 CHECKPOINTS = [
     (117.596597, 31.608729), (117.596941, 31.608327),
@@ -106,9 +106,9 @@ FONT_L = ("Microsoft YaHei UI", 10)
 MONO = ("Consolas", 9)
 
 DEFAULT_CFG = {
-    "token": "bb8b3b75-e1a7-4287-87fc-3e790b60cf15",
-    "username": "25204130216", "password": "", "school_id": "169",
-    "deviceid": "8089983D-44D0-4B26-AEA7-9DDAB2684E1D", "devicename": "iPhone 16 Pro",
+    "token": "00000000-0000-0000-0000-000000000000",
+    "username": "20230000001", "password": "", "school_id": "100",
+    "deviceid": "00000000-0000-0000-0000-000000000000", "devicename": "iPhone 16 Pro",
     "platform": "ios", "base": BASE,
     "dist_km": 3.0, "duration_s": 840, "n_points": 50,
     "marks": 5, "pace": 4.67, "cadence": 170, "strides": 0.8,
@@ -247,7 +247,7 @@ class API:
                 "orientationNum": 0, "runSteps": cad, "cardPointList": chunk, "simulateNum": 0,
                 "time": float(chunk[-1]["runTime"]) - float(chunk[0]["runTime"]),
                 "crsRunRecordId": rec_id, "speeds": f"{pace:.2f}",
-                "schoolId": info.get("schoolId", 169), "strides": 0.8, "userName": student}, gz=True)
+                "schoolId": info.get("schoolId", 100), "strides": 0.8, "userName": student}, gz=True)
             time.sleep(1.0)
         mg = [{"point": f"{lon},{lat}",
                "marked": "Y" if i in MARK_Y[:int(self.cfg["marks"])] else "N",
@@ -396,7 +396,7 @@ class App(tk.Tk):
 
     # ── 页面 ──
     def page_run(self):
-        c = self.card("跑步控制", "滨湖校区大四男生跑 · T2 · 2.6–10 km · 06:00–23:00")
+        c = self.card("跑步控制", "主校区高年级男生跑 · T2 · 2.6–10 km · 06:00–23:00")
         tk.Label(c, text="里程 2.6–10 km    配速 3–10    打卡 3–5",
                  bg=CARD, fg=T3, font=FONT).pack(anchor="w")
         for key, label, lo, hi, res, unit in [
@@ -535,7 +535,7 @@ class App(tk.Tk):
         c = self.card("SM4 加解密", "国密 SM4 · ECB · PKCS7")
         tk.Label(c, text="密钥 / 明文或密文", bg=CARD, fg=T2, font=FONT, anchor="w").pack(fill="x")
         self.c_in = tk.Text(c, height=5, font=MONO, bg="white", relief="flat", bd=6)
-        self.c_in.insert("1.0", '{"type":"1","schoolId":"169"}')
+        self.c_in.insert("1.0", '{"type":"1","schoolId":"100"}')
         self.c_in.pack(fill="x", pady=2)
         btns = tk.Frame(c, bg=CARD); btns.pack(fill="x", pady=8)
         tk.Button(btns, text="加密", bg=BLUE, fg="white", relief="flat", font=FONT_L,
@@ -576,7 +576,7 @@ class App(tk.Tk):
                 tk.Label(f, text=text, bg=CARD, fg=col, font=FONT_L, width=w, anchor="w").pack(side="left")
         tk.Button(c, text="刷新历史", bg=CARD, fg=T2, relief="flat", font=FONT_L,
                   padx=14, pady=6, cursor="hand2",
-                  command=lambda: self.api.call("/run/crsReocordInfoList", {"tableName": "crs_run_record169"})
+                  command=lambda: self.api.call("/run/crsReocordInfoList", {"tableName": "crs_run_record100"})
                   ).pack(anchor="w", pady=8)
 
 

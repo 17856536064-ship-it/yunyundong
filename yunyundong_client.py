@@ -26,17 +26,17 @@ CIPHER_KEY = (
 )
 APPSECRET = "0h1UIfMDSc7piesRINRXXfkE"          # E16 IPA 格式串
 MD5KEY_REPO = "pie0hDSfMRINRXc7s1UIXfkE"          # 仓库 3.4.7，备用
-BASE = "http://60.174.215.2:8000/m-api"
+BASE = "http://192.0.2.10:8000/m-api"
 SPORTS_BASE = "https://sports.aiyyd.com:9011/api/app"
-DEVICE_ID = "8089983D-44D0-4B26-AEA7-9DDAB2684E1D"
+DEVICE_ID = "00000000-0000-0000-0000-000000000000"
 DEVICE_NAME = "iPhone 16 Pro"
 UA = "LePao/3.6.6 (iPhone; iOS 26.6; Scale/3.00)"
 SYS_EDITION = "26.6"
 APP_EDITION = "3.6.6"
 PLATFORM = "ios"
-TOKEN = "bb8b3b75-e1a7-4287-87fc-3e790b60cf15"
-SCHOOL_ID = "169"
-USER_NAME = "25204130216"
+TOKEN = "00000000-0000-0000-0000-000000000000"
+SCHOOL_ID = "100"
+USER_NAME = "20230000001"
 
 
 def getsign(utc: str, u: str, appsecret: str = APPSECRET) -> str:
@@ -561,7 +561,7 @@ def run_qualified(api: YunAPI, dist_km=3.0, duration_s=840, n_pts=50):
     rec_id = start["data"]["id"]
     rec_start = start["data"].get("recordStartTime", "")
     student = start["data"].get("studentId", "")
-    meta = {"crsRunRecordId": rec_id, "schoolId": info.get("schoolId", 169),
+    meta = {"crsRunRecordId": rec_id, "schoolId": info.get("schoolId", 100),
             "userName": student, "strides": 0.8, "speeds": "5.50",
             "cadence_min": 170, "cadence_max": 175}
     pts = synth_points(n_pts, dist_km, duration_s)

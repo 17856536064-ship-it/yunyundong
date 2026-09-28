@@ -92,7 +92,7 @@ python yunyundong_full.py
 {
   "username": "学号",
   "password": "密码",
-  "school_id": "169",
+  "school_id": "100",
   "dist_km": 3.0,
   "duration_s": 840,
   "n_points": 50,
